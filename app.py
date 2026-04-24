@@ -29,5 +29,10 @@ def create_app():
 
 app = create_app()
 
+
+def init_db():
+    with app.app_context():
+        db.create_all()
+    return "Tables créées avec succès !"
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True)@app.route("/init-db")
