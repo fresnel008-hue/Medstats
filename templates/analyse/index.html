@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Analyse - MedStats{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 900px; margin: 0 auto;">
+
+    <!-- SCORE -->
+    <div class="card" style="text-align: center; padding: 40px;">
+        <h2 style="color: #333; margin-bottom: 25px;">
+            📊 Analyse du {{ d.date.strftime('%d/%m/%Y à %H:%M') }}
+        </h2>
+        <div class="score-circle" style="border-color: {{ couleur }};">
+            <span class="chiffre" style="color: {{ couleur }};">{{ score }}</span>
+            <span class="sur">/100</span>
+        </div>
+        <div style="font-size: 22px; font-weight: bold; color: {{ couleur }};">
+            {{ emoji }} Score de santé : {{ niveau }}
+        </div>
+        <p style="color: #777; margin-top: 10px; font-size: 14px;">
+            Basé sur {{ total }} collecte(s) au total
+        </p>
+    </div>
+
+    <!-- DETAILS -->
+    <div class="card">
+        <div class="card-header">
+            <h3>📋 Détails de la collecte</h3>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+            <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 22px; font-weight: bold; color: #667eea;">{{ d.imc }}</div>
+                <div style="font-size: 12px; color: #777; margin-top: 5px;">IMC</div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 22px; font-weight: bold; color: #667eea;">{{ d.tension_systolique }}/{{ d.tension_diastolique }}</div>
+                <div style="font-size: 12px; color: #777; margin-top: 5px;">Tension (mmHg)</div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 22px; font-weight: bold; color: #667eea;">{{ d.frequence_cardiaque }}</div>
+                <div style="font-size: 12px; color: #777; margin-top: 5px;">FC (bpm)</div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 22px; font-weight: bold; color: #667eea;">{{ d.heures_sommeil }}h</div>
+                <div style="font-size: 12px; color: #777; margin-top: 5px;">Sommeil</div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 22px; font-weight: bold; color: #667eea;">{{ d.niveau_stress }}/5</div>
+                <div style="font-size: 12px; color: #777; margin-top: 5px;">Stress</div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 22px; font-weight: bold; color: #667eea;">{{ d.niveau_humeur }}/5</div>
+                <div style="font-size: 12px; color: #777; margin-top: 5px;">Humeur</div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 22px; font-weight: bold; color: #667eea;">{{ d.niveau_energie }}/5</div>
+                <div style="font-size: 12px; color: #777; margin-top: 5px;">Énergie</div>
+            </div>
+            <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 22px; font-weight: bold; color: #667eea;">{{ d.verres_eau }}</div>
+                <div style="font-size: 12px; color: #777; margin-top: 5px;">Verres d'eau</div>
+            </div>
+        </div>
+
+        <!-- Symptômes -->
+        <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+            {% if d.maux_tete %}
+            <span class="badge badge-danger">🤕 Maux de tête</span>
+            {% endif %}
+            {% if d.fatigue %}
+            <span class="badge badge-warning">😪 Fatigue</span>
+            {% endif %}
+            {% if d.douleurs %}
+            <span class="badge badge-danger">😣 Douleurs</span>
+            {% endif %}
+            {% if not d.maux_tete and not d.fatigue and not d.douleurs %}
+            <span class="badge badge-success">✅ Aucun symptôme</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- RECOMMANDATIONS -->
+    <div class="card">
+        <div class="card-header">
+            <h3>💡 Recommandations personnalisées</h3>
+        </div>
+        {% for reco in recommandations %}
+        <div class="reco-item reco-{{ reco.type }}">
+            {{ reco.icon }} {{ reco.texte }}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- STATS HISTORIQUES -->
+    {% if stats %}
+    <div class="card">
+        <div class="card-header">
+            <h3>📈 Statistiques descriptives globales</h3>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Indicateur</th>
+                        <th>Moyenne</th>
+                        <th>Médiane</th>
+                        <th>Écart-type</th>
+                        <th>Min</th>
+                        <th>Max</th>
+                        <th>Q1</th>
+                        <th>Q3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>IMC</b></td>
+                        <td>{{ stats.imc_moyen }}</td>
+                        <td>-</td>
+                        <td>{{ stats.imc_std }}</td>
+                        <td>{{ stats.imc_min }}</td>
+                        <td>{{ stats.imc_max }}</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><b>Stress</b></td>
+                        <td>{{ stats.stress_moyen }}</td>
+                        <td>{{ stats.stress_median }}</td>
+                        <td>{{ stats.stress_std }}</td>
+                        <td>{{ stats.stress_min }}</td>
+                        <td>{{ stats.stress_max }}</td>
+                        <td>{{ stats.q1_stress }}</td>
+                        <td>{{ stats.q3_stress }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Sommeil (h)</b></td>
+                        <td>{{ stats.sommeil_moyen }}</td>
+                        <td>{{ stats.sommeil_median }}</td>
+                        <td>{{ stats.sommeil_std }}</td>
+                        <td>{{ stats.sommeil_min }}</td>
+                        <td>{{ stats.sommeil_max }}</td>
+                        <td>{{ stats.q1_sommeil }}</td>
+                        <td>{{ stats.q3_sommeil }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Humeur</b></td>
+                        <td>{{ stats.humeur_moyenne }}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><b>Énergie</b></td>
+                        <td>{{ stats.energie_moyenne }}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="margin-top: 15px; font-size: 13px; color: #777;">
+            🔗 Corrélation Stress/Sommeil : <b>{{ stats.correlation_stress_sommeil }}</b>
+            {% if stats.correlation_stress_sommeil < -0.5 %}
+            (corrélation négative forte — plus de stress = moins de sommeil)
+            {% elif stats.correlation_stress_sommeil > 0.5 %}
+            (corrélation positive forte)
+            {% else %}
+            (corrélation faible)
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- GRAPHIQUES -->
+    <div class="charts-grid">
+        <div class="chart-box">
+            <h3>😰 Évolution du stress</h3>
+            <canvas id="stressChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>😴 Évolution du sommeil</h3>
+            <canvas id="sommeilChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>⚖️ Évolution de l'IMC</h3>
+            <canvas id="imcChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>😊 Évolution de l'humeur</h3>
+            <canvas id="humeurChart"></canvas>
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+        <a href="/export-pdf" class="btn btn-outline">📄 Export PDF</a>
+        <a href="/export-csv" class="btn btn-outline">📊 Export CSV</a>
+        <a href="/collecte" class="btn btn-primary">+ Nouvelle collecte</a>
+        <a href="/dashboard" class="btn btn-outline">← Dashboard</a>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const labels = {{ labels | tojson }};
+    const stress = {{ stress_historique | tojson }};
+    const sommeil = {{ sommeil_historique | tojson }};
+    const imc = {{ imc_historique | tojson }};
+    const humeur = {{ humeur_historique | tojson }};
+
+    function makeChart(id, data, color, label, min, max) {
+        new Chart(document.getElementById(id), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    borderColor: color,
+                    backgroundColor: color + '22',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { min: min, max: max } }
+            }
+        });
+    }
+
+    makeChart('stressChart', stress, '#dc3545', 'Stress', 0, 5);
+    makeChart('sommeilChart', sommeil, '#667eea', 'Sommeil', 0, 12);
+    makeChart('imcChart', imc, '#28a745', 'IMC', 10, 40);
+    makeChart('humeurChart', humeur, '#ffc107', 'Humeur', 0, 5);
+</script>
+{% endblock %}

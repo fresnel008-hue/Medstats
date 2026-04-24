@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - MedStats{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="card" style="background: linear-gradient(135deg, #333, #555); color: white; padding: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="font-size: 24px; margin-bottom: 5px;">⚙️ Panel Administrateur</h2>
+            <p style="opacity: 0.8;">Gestion de la plateforme MedStats</p>
+        </div>
+        <a href="/dashboard" style="
+            background: rgba(255,255,255,0.15);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+        ">← Dashboard</a>
+    </div>
+</div>
+
+<!-- STATS GLOBALES -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="icon">👥</div>
+        <div class="value">{{ total_users }}</div>
+        <div class="label">Utilisateurs total</div>
+    </div>
+    <div class="stat-card" style="border-color: #28a745;">
+        <div class="icon">🆕</div>
+        <div class="value">{{ nouveaux }}</div>
+        <div class="label">Nouveaux cette semaine</div>
+    </div>
+    <div class="stat-card" style="border-color: #17a2b8;">
+        <div class="icon">📊</div>
+        <div class="value">{{ total_donnees }}</div>
+        <div class="label">Collectes totales</div>
+    </div>
+    <div class="stat-card" style="border-color: #ffc107;">
+        <div class="icon">🔔</div>
+        <div class="value">{{ total_notifs }}</div>
+        <div class="label">Notifications envoyées</div>
+    </div>
+</div>
+
+{% if stats_globales %}
+<!-- STATS PLATEFORME -->
+<div class="card">
+    <div class="card-header">
+        <h3>📈 Statistiques globales de la plateforme</h3>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+        <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+            <div style="font-size: 22px; font-weight: bold; color: #667eea;">
+                {{ stats_globales.imc_moyen }}
+            </div>
+            <div style="font-size: 12px; color: #777; margin-top: 5px;">IMC moyen</div>
+        </div>
+        <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+            <div style="font-size: 22px; font-weight: bold; color: #dc3545;">
+                {{ stats_globales.stress_moyen }}/5
+            </div>
+            <div style="font-size: 12px; color: #777; margin-top: 5px;">Stress moyen</div>
+        </div>
+        <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+            <div style="font-size: 22px; font-weight: bold; color: #667eea;">
+                {{ stats_globales.sommeil_moyen }}h
+            </div>
+            <div style="font-size: 12px; color: #777; margin-top: 5px;">Sommeil moyen</div>
+        </div>
+        <div style="text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+            <div style="font-size: 22px; font-weight: bold; color: #28a745;">
+                {{ stats_globales.activite_moyenne }}min
+            </div>
+            <div style="font-size: 12px; color: #777; margin-top: 5px;">Activité moyenne</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- NOTIFIER TOUS -->
+<div class="card">
+    <div class="card-header">
+        <h3>📢 Envoyer une notification à tous</h3>
+    </div>
+    <form method="POST" action="/admin/notifier">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Message</label>
+                <input type="text" name="message" class="form-control"
+                    placeholder="Votre message..." required>
+            </div>
+            <div class="form-group">
+                <label>Type</label>
+                <select name="type" class="form-control">
+                    <option value="info">ℹ️ Information</option>
+                    <option value="alerte">⚠️ Alerte</option>
+                    <option value="succes">✅ Succès</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            📢 Envoyer à tous les utilisateurs
+        </button>
+    </form>
+</div>
+
+<!-- LISTE UTILISATEURS -->
+<div class="card">
+    <div class="card-header">
+        <h3>👥 Gestion des utilisateurs</h3>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Inscription</th>
+                    <th>Dernière connexion</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td><b>{{ user.username }}</b></td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge {{ 'badge-danger' if user.role == 'admin' else 'badge-info' }}">
+                            {{ user.role }}
+                        </span>
+                    </td>
+                    <td>{{ user.date_inscription.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        {% if user.derniere_connexion %}
+                        {{ user.derniere_connexion.strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
+                        Jamais
+                        {% endif %}
+                    </td>
+                    <td style="display: flex; gap: 5px;">
+                        <a href="/admin/user/{{ user.id }}"
+                           class="btn btn-info btn-sm">👁️</a>
+                        {% if user.role != 'admin' %}
+                        <a href="/admin/user/{{ user.id }}/promouvoir"
+                           class="btn btn-warning btn-sm"
+                           onclick="return confirm('Promouvoir en admin ?')">⬆️</a>
+                        <a href="/admin/user/{{ user.id }}/supprimer"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Supprimer cet utilisateur ?')">🗑️</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

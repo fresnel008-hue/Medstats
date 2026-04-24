@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - MedStats</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+        .logo {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .logo h1 { font-size: 36px; margin-bottom: 5px; }
+        .logo p { font-size: 14px; opacity: 0.8; }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 22px;
+            text-align: center;
+        }
+        .form-group { margin-bottom: 18px; }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .alert-danger { background: #ffe0e0; color: #c00; }
+        .links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+        .links a { color: #667eea; text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
+        .divider {
+            text-align: center;
+            margin: 15px 0;
+            color: #ccc;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">
+            <h1>📊 MedStats</h1>
+            <p>Votre santé, analysée intelligemment</p>
+        </div>
+
+        <div class="card">
+            <h2>🔐 Connexion</h2>
+
+            {% if error %}
+            <div class="alert alert-danger">⚠️ {{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <label>Adresse email</label>
+                    <input type="email" name="email" placeholder="votre@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn">Se connecter</button>
+            </form>
+
+            <div class="divider">─── ou ───</div>
+
+            <div class="links">
+                <a href="/forgot-password">Mot de passe oublié ?</a>
+                <br><br>
+                Pas encore de compte ? <a href="/register">S'inscrire</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

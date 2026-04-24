@@ -1,0 +1,11 @@
+flask
+flask-sqlalchemy
+flask-bcrypt
+flask-mail
+psycopg2-binary
+numpy
+pandas
+scipy
+reportlab
+gunicorn
+python-dotenv

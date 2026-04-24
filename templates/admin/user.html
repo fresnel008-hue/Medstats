@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Utilisateur - MedStats Admin{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 900px; margin: 0 auto;">
+
+    <!-- HEADER -->
+    <div class="card" style="background: linear-gradient(135deg, #333, #555); color: white; padding: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="
+                    width: 70px; height: 70px;
+                    border-radius: 50%;
+                    background: rgba(255,255,255,0.2);
+                    display: flex; align-items: center;
+                    justify-content: center;
+                    font-size: 30px; font-weight: bold;
+                ">
+                    {{ user.username[0].upper() }}
+                </div>
+                <div>
+                    <h2 style="font-size: 22px;">{{ user.username }}</h2>
+                    <p style="opacity: 0.8;">{{ user.email }}</p>
+                    <span style="
+                        background: rgba(255,255,255,0.2);
+                        padding: 3px 10px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        margin-top: 5px;
+                        display: inline-block;
+                    ">{{ user.role }}</span>
+                </div>
+            </div>
+            <a href="/admin" style="
+                background: rgba(255,255,255,0.15);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                text-decoration: none;
+            ">← Retour Admin</a>
+        </div>
+    </div>
+
+    <!-- INFOS -->
+    <div class="card">
+        <div class="card-header">
+            <h3>👤 Informations utilisateur</h3>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div style="padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 12px; color: #999;">ID</div>
+                <div style="font-weight: bold; color: #333;">{{ user.id }}</div>
+            </div>
+            <div style="padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 12px; color: #999;">Rôle</div>
+                <div style="font-weight: bold; color: #333;">{{ user.role }}</div>
+            </div>
+            <div style="padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 12px; color: #999;">Date d'inscription</div>
+                <div style="font-weight: bold; color: #333;">
+                    {{ user.date_inscription.strftime('%d/%m/%Y à %H:%M') }}
+                </div>
+            </div>
+            <div style="padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                <div style="font-size: 12px; color: #999;">Dernière connexion</div>
+                <div style="font-weight: bold; color: #333;">
+                    {% if user.derniere_connexion %}
+                    {{ user.derniere_connexion.strftime('%d/%m/%Y à %H:%M') }}
+                    {% else %}
+                    Jamais connecté
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    {% if stats %}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon">📝</div>
+            <div class="value">{{ total }}</div>
+            <div class="label">Collectes totales</div>
+        </div>
+        <div class="stat-card" style="border-color: #28a745;">
+            <div class="icon">⚖️</div>
+            <div class="value">{{ stats.imc_moyen }}</div>
+            <div class="label">IMC moyen</div>
+        </div>
+        <div class="stat-card" style="border-color: #dc3545;">
+            <div class="icon">😰</div>
+            <div class="value">{{ stats.stress_moyen }}/5</div>
+            <div class="label">Stress moyen</div>
+        </div>
+        <div class="stat-card" style="border-color: #17a2b8;">
+            <div class="icon">😴</div>
+            <div class="value">{{ stats.sommeil_moyen }}h</div>
+            <div class="label">Sommeil moyen</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- HISTORIQUE -->
+    {% if donnees %}
+    <div class="card">
+        <div class="card-header">
+            <h3>📋 Historique des collectes</h3>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>IMC</th>
+                        <th>Stress</th>
+                        <th>Sommeil</th>
+                        <th>Humeur</th>
+                        <th>FC</th>
+                        <th>Tension</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in donnees %}
+                    <tr>
+                        <td>{{ d.date.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ d.imc }}</td>
+                        <td>
+                            <span class="badge {{ 'badge-danger' if d.niveau_stress >= 4 else 'badge-success' }}">
+                                {{ d.niveau_stress }}/5
+                            </span>
+                        </td>
+                        <td>{{ d.heures_sommeil }}h</td>
+                        <td>{{ d.niveau_humeur }}/5</td>
+                        <td>{{ d.frequence_cardiaque }} bpm</td>
+                        <td>{{ d.tension_systolique }}/{{ d.tension_diastolique }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="icon">📊</div>
+            <p>Cet utilisateur n'a pas encore de données.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ACTIONS -->
+    <div class="card">
+        <div class="card-header">
+            <h3>⚡ Actions</h3>
+        </div>
+        <div style="display: flex; gap: 15px;">
+            {% if user.role != 'admin' %}
+            <a href="/admin/user/{{ user.id }}/promouvoir"
+               class="btn btn-warning"
+               onclick="return confirm('Promouvoir {{ user.username }} en admin ?')">
+                ⬆️ Promouvoir admin
+            </a>
+            <a href="/admin/user/{{ user.id }}/supprimer"
+               class="btn btn-danger"
+               onclick="return confirm('Supprimer définitivement {{ user.username }} ?')">
+                🗑️ Supprimer
+            </a>
+            {% else %}
+            <span style="color: #999; font-size: 14px;">
+                Impossible de modifier un administrateur.
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

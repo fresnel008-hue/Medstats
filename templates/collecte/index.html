@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Collecte - MedStats{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 750px; margin: 0 auto;">
+
+    <div class="card">
+        <div class="card-header">
+            <h3>📋 Collecte de données santé</h3>
+            <span style="color: #999; font-size: 13px;">
+                Remplissez tous les champs
+            </span>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+
+            <!-- MESURES PHYSIQUES -->
+            <div style="margin-bottom: 25px;">
+                <h4 style="color: #667eea; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #f0f0f0;">
+                    ⚖️ Mesures physiques
+                </h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Poids (kg)</label>
+                        <input type="number" name="poids" class="form-control"
+                            step="0.1" min="20" max="300" placeholder="Ex: 70.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Taille (cm)</label>
+                        <input type="number" name="taille" class="form-control"
+                            min="100" max="250" placeholder="Ex: 175" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tension systolique (mmHg)</label>
+                        <input type="number" name="tension_systolique"
+                            class="form-control" min="60" max="250"
+                            placeholder="Ex: 120">
+                    </div>
+                    <div class="form-group">
+                        <label>Tension diastolique (mmHg)</label>
+                        <input type="number" name="tension_diastolique"
+                            class="form-control" min="40" max="150"
+                            placeholder="Ex: 80">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Fréquence cardiaque (bpm)</label>
+                    <input type="number" name="frequence_cardiaque"
+                        class="form-control" min="30" max="220"
+                        placeholder="Ex: 72">
+                </div>
+            </div>
+
+            <!-- HABITUDES DE VIE -->
+            <div style="margin-bottom: 25px;">
+                <h4 style="color: #667eea; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #f0f0f0;">
+                    🌙 Habitudes de vie
+                </h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Heures de sommeil</label>
+                        <input type="number" name="heures_sommeil"
+                            class="form-control" step="0.5" min="0" max="24"
+                            placeholder="Ex: 7.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Qualité du sommeil (1-5)</label>
+                        <select name="qualite_sommeil" class="form-control">
+                            <option value="1">1 - Très mauvaise</option>
+                            <option value="2">2 - Mauvaise</option>
+                            <option value="3" selected>3 - Moyenne</option>
+                            <option value="4">4 - Bonne</option>
+                            <option value="5">5 - Excellente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Activité physique (minutes)</label>
+                        <input type="number" name="activite_physique"
+                            class="form-control" min="0" max="600"
+                            placeholder="Ex: 30">
+                    </div>
+                    <div class="form-group">
+                        <label>Verres d'eau (verres)</label>
+                        <input type="number" name="verres_eau"
+                            class="form-control" min="0" max="30"
+                            placeholder="Ex: 8">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Calories consommées</label>
+                    <input type="number" name="calories"
+                        class="form-control" min="0" max="10000"
+                        placeholder="Ex: 2000">
+                </div>
+            </div>
+
+            <!-- BIEN-ETRE MENTAL -->
+            <div style="margin-bottom: 25px;">
+                <h4 style="color: #667eea; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #f0f0f0;">
+                    🧠 Bien-être mental
+                </h4>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Niveau de stress (1-5)</label>
+                        <select name="niveau_stress" class="form-control">
+                            <option value="1">1 - Très faible</option>
+                            <option value="2">2 - Faible</option>
+                            <option value="3" selected>3 - Moyen</option>
+                            <option value="4">4 - Élevé</option>
+                            <option value="5">5 - Très élevé</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Humeur (1-5)</label>
+                        <select name="niveau_humeur" class="form-control">
+                            <option value="1">1 - Très mauvaise</option>
+                            <option value="2">2 - Mauvaise</option>
+                            <option value="3" selected>3 - Neutre</option>
+                            <option value="4">4 - Bonne</option>
+                            <option value="5">5 - Excellente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Énergie (1-5)</label>
+                        <select name="niveau_energie" class="form-control">
+                            <option value="1">1 - Épuisé</option>
+                            <option value="2">2 - Fatigué</option>
+                            <option value="3" selected>3 - Normal</option>
+                            <option value="4">4 - Énergique</option>
+                            <option value="5">5 - Très énergique</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYMPTOMES -->
+            <div style="margin-bottom: 25px;">
+                <h4 style="color: #667eea; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #f0f0f0;">
+                    🩺 Symptômes
+                </h4>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Maux de tête</label>
+                        <select name="maux_tete" class="form-control">
+                            <option value="non">Non</option>
+                            <option value="oui">Oui</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fatigue</label>
+                        <select name="fatigue" class="form-control">
+                            <option value="non">Non</option>
+                            <option value="oui">Oui</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Douleurs</label>
+                        <select name="douleurs" class="form-control">
+                            <option value="non">Non</option>
+                            <option value="oui">Oui</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTES -->
+            <div class="form-group">
+                <label>Notes personnelles</label>
+                <textarea name="notes" class="form-control"
+                    rows="3" placeholder="Observations, remarques..."
+                    style="resize: vertical;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    ✅ Soumettre et analyser
+                </button>
+                <a href="/dashboard" class="btn btn-outline" style="flex: 0;">
+                    Annuler
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

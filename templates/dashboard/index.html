@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MedStats{% endblock %}
+
+{% block content %}
+
+<!-- WELCOME -->
+<div class="card" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="font-size: 24px; margin-bottom: 5px;">
+                👋 Bonjour, {{ user.username }} !
+            </h2>
+            <p style="opacity: 0.85;">
+                {% if derniere %}
+                Dernière collecte : {{ derniere.date.strftime('%d/%m/%Y') }}
+                {% else %}
+                Bienvenue sur MedStats ! Commencez votre première collecte.
+                {% endif %}
+            </p>
+        </div>
+        <a href="/collecte" style="
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
+        ">+ Nouvelle collecte</a>
+    </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+{% if notifs %}
+<div class="card">
+    <div class="card-header">
+        <h3>🔔 Notifications</h3>
+        <span class="badge badge-danger">{{ notifs|length }}</span>
+    </div>
+    {% for notif in notifs[:3] %}
+    <div class="alert alert-{{ 'danger' if notif.type == 'alerte' else 'info' }}"
+         style="display: flex; justify-content: space-between; align-items: center;">
+        <span>{{ notif.message }}</span>
+        <a href="/notif/lire/{{ notif.id }}"
+           style="color: inherit; font-size: 12px; opacity: 0.7;">✓ Lu</a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if donnees %}
+
+<!-- STATS CARDS -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="icon">📝</div>
+        <div class="value">{{ total }}</div>
+        <div class="label">Collectes totales</div>
+    </div>
+    <div class="stat-card" style="border-color: #28a745;">
+        <div class="icon">⚖️</div>
+        <div class="value">{{ stats.imc_moyen }}</div>
+        <div class="label">IMC moyen</div>
+    </div>
+    <div class="stat-card" style="border-color: #dc3545;">
+        <div class="icon">😰</div>
+        <div class="value">{{ stats.stress_moyen }}/5</div>
+        <div class="label">Stress moyen</div>
+    </div>
+    <div class="stat-card" style="border-color: #17a2b8;">
+        <div class="icon">😴</div>
+        <div class="value">{{ stats.sommeil_moyen }}h</div>
+        <div class="label">Sommeil moyen</div>
+    </div>
+    <div class="stat-card" style="border-color: #ffc107;">
+        <div class="icon">❤️</div>
+        <div class="value">{{ stats.fc_moyenne }}</div>
+        <div class="label">FC moyenne (bpm)</div>
+    </div>
+    <div class="stat-card" style="border-color: #764ba2;">
+        <div class="icon">💧</div>
+        <div class="value">{{ stats.eau_moyenne }}</div>
+        <div class="label">Verres d'eau/jour</div>
+    </div>
+    <div class="stat-card" style="border-color: #28a745;">
+        <div class="icon">🏃</div>
+        <div class="value">{{ stats.activite_moyenne }}min</div>
+        <div class="label">Activité/jour</div>
+    </div>
+    <div class="stat-card" style="border-color: #667eea;">
+        <div class="icon">😊</div>
+        <div class="value">{{ stats.humeur_moyenne }}/5</div>
+        <div class="label">Humeur moyenne</div>
+    </div>
+</div>
+
+<!-- TENDANCES -->
+<div class="card">
+    <div class="card-header">
+        <h3>📈 Tendances</h3>
+        <a href="/analyse" class="btn btn-outline btn-sm">Voir tout</a>
+    </div>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+            <div style="font-size: 24px;">
+                {% if stats.tendance_stress == 'hausse' %}📈
+                {% elif stats.tendance_stress == 'baisse' %}📉
+                {% else %}➡️{% endif %}
+            </div>
+            <div style="font-size: 13px; color: #555; margin-top: 5px;">Stress</div>
+            <div style="font-size: 12px; color: #999;">{{ stats.tendance_stress }}</div>
+        </div>
+        <div style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+            <div style="font-size: 24px;">
+                {% if stats.tendance_sommeil == 'hausse' %}📈
+                {% elif stats.tendance_sommeil == 'baisse' %}📉
+                {% else %}➡️{% endif %}
+            </div>
+            <div style="font-size: 13px; color: #555; margin-top: 5px;">Sommeil</div>
+            <div style="font-size: 12px; color: #999;">{{ stats.tendance_sommeil }}</div>
+        </div>
+        <div style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+            <div style="font-size: 24px;">
+                {% if stats.tendance_humeur == 'hausse' %}📈
+                {% elif stats.tendance_humeur == 'baisse' %}📉
+                {% else %}➡️{% endif %}
+            </div>
+            <div style="font-size: 13px; color: #555; margin-top: 5px;">Humeur</div>
+            <div style="font-size: 12px; color: #999;">{{ stats.tendance_humeur }}</div>
+        </div>
+        <div style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+            <div style="font-size: 24px;">🔗</div>
+            <div style="font-size: 13px; color: #555; margin-top: 5px;">Corrélation Stress/Sommeil</div>
+            <div style="font-size: 12px; color: #999;">{{ stats.correlation_stress_sommeil }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- GRAPHIQUES -->
+<div class="charts-grid">
+    <div class="chart-box">
+        <h3>😰 Évolution du stress</h3>
+        <canvas id="stressChart"></canvas>
+    </div>
+    <div class="chart-box">
+        <h3>😴 Évolution du sommeil</h3>
+        <canvas id="sommeilChart"></canvas>
+    </div>
+</div>
+
+<!-- DERNIÈRES COLLECTES -->
+<div class="card">
+    <div class="card-header">
+        <h3>📋 Dernières collectes</h3>
+        <a href="/analyse" class="btn btn-outline btn-sm">Voir tout</a>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>IMC</th>
+                    <th>Stress</th>
+                    <th>Sommeil</th>
+                    <th>Humeur</th>
+                    <th>FC</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in donnees[:10] %}
+                <tr>
+                    <td>{{ d.date.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ d.imc }}</td>
+                    <td>
+                        <span class="badge {{ 'badge-danger' if d.niveau_stress >= 4 else 'badge-success' }}">
+                            {{ d.niveau_stress }}/5
+                        </span>
+                    </td>
+                    <td>{{ d.heures_sommeil }}h</td>
+                    <td>{{ d.niveau_humeur }}/5</td>
+                    <td>{{ d.frequence_cardiaque }} bpm</td>
+                    <td>
+                        <a href="/analyse/{{ d.id }}"
+                           class="btn btn-primary btn-sm">Voir</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% else %}
+
+<!-- EMPTY STATE -->
+<div class="card">
+    <div class="empty-state">
+        <div class="icon">📊</div>
+        <p>Aucune donnée encore collectée.</p>
+        <a href="/collecte" class="btn btn-primary">
+            Commencer ma première collecte
+        </a>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% if donnees %}
+<script>
+    const labels7j = {{ donnees_7j | map(attribute='date') | list | tojson }};
+    const stress7j = {{ donnees_7j | map(attribute='niveau_stress') | list | tojson }};
+    const sommeil7j = {{ donnees_7j | map(attribute='heures_sommeil') | list | tojson }};
+
+    new Chart(document.getElementById('stressChart'), {
+        type: 'line',
+        data: {
+            labels: {{ donnees[:10] | map(attribute='date') | list | tojson }},
+            datasets: [{
+                data: {{ donnees[:10] | map(attribute='niveau_stress') | list | tojson }},
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220,53,69,0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { min: 0, max: 5 } }
+        }
+    });
+
+    new Chart(document.getElementById('sommeilChart'), {
+        type: 'line',
+        data: {
+            labels: {{ donnees[:10] | map(attribute='date') | list | tojson }},
+            datasets: [{
+                data: {{ donnees[:10] | map(attribute='heures_sommeil') | list | tojson }},
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102,126,234,0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { min: 0, max: 12 } }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}
